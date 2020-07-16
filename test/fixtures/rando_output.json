@@ -1,0 +1,21 @@
+{
+  "foo.bar.baz.FooCheck": {
+    "checks": {
+      "test_foo": {
+        "status": "pass",
+        "warnings_count": 0,
+        "failures_count": 0
+      },
+      "test_bar": {
+        "status": "fail",
+        "warnings_count": 2,
+        "failures_count": 3
+      },
+      "test_baz": {
+        "status": "warn",
+        "warnings_count": 4,
+        "failures_count": 0
+      }
+    }
+  }
+}
