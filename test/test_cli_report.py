@@ -47,7 +47,12 @@ class TestHarvestCLIReport(unittest.TestCase):
         """Ensures processing stops when package is not found."""
         self.mock_get_report_module.side_effect = ModuleNotFoundError()
         self.harvest.run(
-            ['report', 'foo-org', 'bar-repo', 'no.such.pkg', 'a_module']
+            [
+                'report',
+                'https://github.com/foo/bar',
+                'no.such.pkg',
+                'a_module'
+            ]
         )
         self.mock_get_report_module.assert_called_once_with(
             'no.such.pkg', 'a_module'
@@ -61,7 +66,12 @@ class TestHarvestCLIReport(unittest.TestCase):
         self.mock_get_report_module.return_value = 'a_module'
         self.mock_get_report_classes.return_value = None
         self.harvest.run(
-            ['report', 'foo-org', 'bar-repo', 'a.valid.pkg', 'a_module']
+            [
+                'report',
+                'https://github.com/foo/bar',
+                'a.valid.pkg',
+                'a_module'
+            ]
         )
         self.mock_get_report_module.assert_called_once_with(
             'a.valid.pkg', 'a_module'
@@ -75,7 +85,12 @@ class TestHarvestCLIReport(unittest.TestCase):
         self.mock_get_report_module.return_value = 'a_module'
         self.mock_get_report_classes.return_value = ['rpt1', 'rpt2']
         self.harvest.run(
-            ['report', 'foo-org', 'bar-repo', 'a.valid.pkg', 'a_module']
+            [
+                'report',
+                'https://github.com/foo/bar',
+                'a.valid.pkg',
+                'a_module'
+            ]
         )
         self.mock_get_report_module.assert_called_once_with(
             'a.valid.pkg', 'a_module'
@@ -92,8 +107,7 @@ class TestHarvestCLIReport(unittest.TestCase):
         self.harvest.run(
             [
                 'report',
-                'foo-org',
-                'bar-repo',
+                'https://github.com/foo/bar',
                 'a.valid.pkg',
                 'a_module',
                 '--template-dir',
@@ -117,8 +131,7 @@ class TestHarvestCLIReport(unittest.TestCase):
         self.harvest.run(
             [
                 'report',
-                'foo-org',
-                'bar-repo',
+                'https://github.com/foo/bar',
                 'a.valid.pkg',
                 'a_module',
                 '--template-dir',

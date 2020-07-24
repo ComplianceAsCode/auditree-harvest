@@ -1,8 +1,10 @@
-# auditree-harvest
-
 [![OS Compatibility][platform-badge]](#prerequisites)
 [![Python Compatibility][python-badge]][python-dl]
 [![pre-commit][pre-commit-badge]][pre-commit]
+[![Code validation](https://github.com/ComplianceAsCode/auditree-harvest/workflows/format%20%7C%20lint%20%7C%20test/badge.svg)][lint-test]
+[![Upload Python Package](https://github.com/ComplianceAsCode/auditree-harvest/workflows/PyPI%20upload/badge.svg)][pypi-upload]
+
+# auditree-harvest
 
 The Auditree data gathering and reporting tool.
 
@@ -26,13 +28,13 @@ site or installed using your package manager.
 
 Python version can be checked with:
 
-```
-> python --version
+```sh
+python --version
 ```
 
 or
 
-```
+```sh
 python3 --version
 ```
 
@@ -44,13 +46,18 @@ It is best practice, but not mandatory, to run `harvest` from a dedicated Python
 virtual environment.  Assuming that you have the Python [virtualenv][virtual-env]
 package already installed, you can create a virtual environment named `venv` by
 executing `virtualenv venv` which will create a `venv` folder at the location of
-where you executed the command.
+where you executed the command.  Alternatively you can use the python `venv` module
+to do the same.
+
+```sh
+python3 -m venv venv
+```
 
 Assuming that you have a virtual environment and that virtual environment is in
 the current directory then to install a new instance of `harvest`, activate
 your virtual environment and use `pip` to install `harvest` like so:
 
-```
+```sh
 . ./venv/bin/activate
 pip install auditree-harvest
 ```
@@ -58,7 +65,7 @@ pip install auditree-harvest
 As we add functionality to `harvest` users will want to upgrade their `harvest`
 package regularly.  To upgrade `harvest` to the most recent version do:
 
-```
+```sh
 . ./venv/bin/activate
 pip install auditree-harvest --upgrade
 ```
@@ -85,16 +92,15 @@ token=your-gh-token
 ### Collate data
 
 To collate historical versions of a file from a Git repository hosting service
-like Github, provide the organization (`org` positional argument), the repository
-name (`repo` positional argument), the relative path to the file within the remote
-repository including the file name (`filepath` positional argument) and an optional
-date range (`--start` and `--end` arguments).  You can also, optionally, provide
-the local Git repository path (`--repo-path` argument), if the repository
-already exists locally and you wish to override the remote repository download
-behavior.
+like Github, provide the repository URL (`repo` positional argument), the
+relative path to the file within the remote repository including the file name
+(`filepath` positional argument) and an optional date range (`--start` and `--end`
+arguments).  You can also, optionally, provide the local Git repository path
+(`--repo-path` argument), if the repository already exists locally and you wish
+to override the remote repository download behavior.
 
-```
-harvest collate org-foo repo-bar /raw/baz/baz.json --start 20191201 --end 20191212 --repo-path ./bar-repo
+```sh
+harvest collate https://github.com/org-foo/repo-bar /raw/baz/baz.json --start 20191201 --end 20191212 --repo-path ./bar-repo
 ```
 
 - File versions are written to the current local directory where `harvest` was
@@ -115,28 +121,28 @@ date is retrieved.
 ### Generate report(s)
 
 To run a report using content contained in a Git repository hosting service
-like Github, provide the organization (`org` positional argument), the repository
-name (`repo` positional argument), the report package (`package`), the report name (`name`
-positional argument) and include any configuration that the report requires (`--config`)
-as a JSON string.  You can also, optionally, provide the local Git repository path
-(`--repo-path` argument), if the repository already exists locally and you wish
-to override the remote repository download behavior.
+like Github, provide the repository URL (`repo` positional argument), the report
+package (`package`), the report name (`name` positional argument) and include
+any configuration that the report requires (`--config`) as a JSON string.  You
+can also, optionally, provide the local Git repository path (`--repo-path`
+argument), if the repository already exists locally and you wish to override
+the remote repository download behavior.
 
-```
-harvest report org-foo repo-bar auditree_arboretum check_results_summary --config '{"start":"20191212","end":"20191221"}'
+```sh
+harvest report https://github.com/org-foo/repo-bar auditree_arboretum check_results_summary --config '{"start":"20191212","end":"20191221"}'
 ```
 
 #### Getting report details
 
 To see a full summary of available reports within any package (like `auditree-arboretum`) do:
 
-```
+```sh
 harvest reports auditree_arboretum --list
 ```
 
 To see details on a specific report that include usage example do something like:
 
-```
+```sh
 harvest reports auditree_arboretum --detail check_results_summary
 ```
 
@@ -228,3 +234,5 @@ it will handle the rest.
 [pps-rpt-tmpl]: https://github.com/ComplianceAsCode/auditree-harvest/blob/main/auditree_arboretum/provider/auditree/reports/report_templates/python_packages_summary.md.tmpl
 [pre-commit-badge]: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
 [pre-commit]: https://github.com/pre-commit/pre-commit
+[lint-test]: https://github.com/ComplianceAsCode/auditree-harvest/actions?query=workflow%3A%22Test+python+code+%26+lint%22
+[pypi-upload]: https://github.com/ComplianceAsCode/auditree-harvest/actions?query=workflow%3A%22Upload+Python+Package%22

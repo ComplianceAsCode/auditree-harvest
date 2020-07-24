@@ -1,34 +1,10 @@
 # Contributing
 
-If you want to add to the harvest tool, please familiarize yourself with the code & our [Coding Standards][].
-Before you submit a PR, please [file an issue][new collab] to request collaborator access.
+If you want to add to harvest, please familiarise yourself with the code & our [Coding Standards][]. Before you submit a PR, please [file an issue][new collab] to request collaborator access.
 
-## Assumptions and pre-requisites
+If you would like to contribute reports, either add them via PR to [Arboretum][] or push to your own repository & let us know of its existence.
 
-The following is a list of topics that contributors **should already** be comfortable
-with in order to contribute to `harvest`.  Details on these topics are outside of
-the scope of the `harvest` documentation.
-
-- [Python][python]
-
-  Moderate to advanced experience with Python code is necessary to contribute
-  to the `harvest`.
-
-- Python [unit tests][python-unit-tests]
-
-  An understanding of the Python unit testing framework including mocking and patching is
-  expected and needed to write unit tests for any `harvest` contribution.
-
-- [Jinja2][jinja2]
-
-  Familiarity with [Jina2][jinja2] is useful if you're looking to write templated reports.
-
-- Auditree [compliance framework][auditree-framework]
-
-  Typical use cases for `harvest` center around gather evidence from an evidence locker
-  and optionally formatting, filtering, and manipulating that evidence into readable reports.
-  To that end, a general understanding of the Auditree [compliance framework][auditree-framework] is
-  useful.
+Follow the guidelines outlined in the [generating reports][] section of the harvest docs when contributing reports to [Arboretum][].
 
 ## Code formatting and style
 
@@ -52,11 +28,7 @@ suite locally by using:
 make test
 ```
 
+[Arboretum]: https://github.com/ComplianceAsCode/auditree-arboretum
 [Coding Standards]: https://github.com/ComplianceAsCode/auditree-framework/blob/master/doc/coding-standards.rst
-[flake8]: https://gitlab.com/pycqa/flake8
+[generating reports]: https://github.com/ComplianceAsCode/auditree-harvest#generate-reports
 [new collab]: https://github.com/ComplianceAsCode/auditree-harvest/issues/new?template=new-collaborator.md
-[yapf]: https://github.com/google/yapf
-[python]: https://www.python.org/
-[python-unit-tests]: https://docs.python.org/3/library/unittest.html
-[jinja2]: http://jinja.pocoo.org/docs/2.10/
-[auditree-framework]: https://github.com/ComplianceAsCode/auditree-framework

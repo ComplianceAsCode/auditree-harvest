@@ -18,6 +18,9 @@ import json
 import os
 from argparse import SUPPRESS
 from datetime import datetime
+from urllib.parse import urlparse
+
+from compliance.utils.credentials import Config
 
 from harvest import __version__ as version
 from harvest.collator import Collator
@@ -31,17 +34,16 @@ from harvest.utils import (
 
 from ilcli import Command
 
-from utilitarian import config_spec, credentials
-
 
 class _CoreHarvestCommand(Command):
 
     def _init_arguments(self):
         self.add_argument(
-            'org', help='the organization (owner) of a repository'
-        )
-        self.add_argument(
-            'repo', help='the name of a repository within an organization'
+            'repo',
+            help=(
+                'the URL to the repository containing files to be processed '
+                'by harvest, as an example https://github.com/my-org/my-repo'
+            )
         )
         self.add_argument(
             '--repo-path',
@@ -61,6 +63,13 @@ class _CoreHarvestCommand(Command):
         self.add_argument(
             '--no-validate', action='store_false', help=SUPPRESS, default=True
         )
+
+    def _validate_arguments(self, args):
+        parsed = urlparse(args.repo)
+        if not (parsed.scheme and parsed.hostname and parsed.path):
+            return (
+                'ERROR: repo url must be of the form https://hostname/org/repo'
+            )
 
 
 class Collate(_CoreHarvestCommand):
@@ -109,12 +118,12 @@ class Collate(_CoreHarvestCommand):
             return 'ERROR: start date cannot be after end date'
         if args.end > datetime.today():
             return 'ERROR: end date cannot be in the future'
+        return super()._validate_arguments(args)
 
     def _run(self, args):
         collator = Collator(
-            args.org,
             args.repo,
-            credentials.Config(args.creds, spec=config_spec.NullConfigSpec()),
+            Config(args.creds),
             'master',
             args.repo_path,
             args.no_validate
@@ -167,12 +176,12 @@ class Report(_CoreHarvestCommand):
         self.template_dir = args.template_dir or os.path.dirname(
             rpt_module.__file__
         )
+        return super()._validate_arguments(args)
 
     def _run(self, args):
         reporter = self.report(
-            args.org,
             args.repo,
-            credentials.Config(args.creds, spec=config_spec.NullConfigSpec()),
+            Config(args.creds),
             'master',
             args.repo_path,
             self.template_dir,

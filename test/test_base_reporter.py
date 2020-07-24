@@ -37,15 +37,20 @@ class TestBaseReporter(unittest.TestCase):
 
     def setUp(self):
         """Initialize supporting test objects before each test."""
-        self.args = ['org', 'repo', 'creds', 'branch', 'repo-path', TMPLT_DIR]
+        self.args = [
+            'https://github.com/org/repo',
+            'creds',
+            'branch',
+            'repo-path',
+            TMPLT_DIR
+        ]
         self.reporter = BaseReporter(*self.args)
 
     def test_constructor_with_config(self):
         """Ensures base reporter object is constructed with config."""
         reporter = BaseReporter(*self.args, foo='foo', bar='bar')
         self.assertIsInstance(reporter, BaseReporter)
-        self.assertEqual(reporter.org, 'org')
-        self.assertEqual(reporter.repo, 'repo')
+        self.assertEqual(reporter.repo_url, 'https://github.com/org/repo')
         self.assertEqual(reporter.creds, 'creds')
         self.assertEqual(reporter.branch, 'branch')
         self.assertEqual(reporter.repo_path, 'repo-path')
@@ -56,8 +61,7 @@ class TestBaseReporter(unittest.TestCase):
     def test_constructor_without_config(self):
         """Ensures base reporter object is constructed without config."""
         self.assertIsInstance(self.reporter, BaseReporter)
-        self.assertEqual(self.reporter.org, 'org')
-        self.assertEqual(self.reporter.repo, 'repo')
+        self.assertEqual(self.reporter.repo_url, 'https://github.com/org/repo')
         self.assertEqual(self.reporter.creds, 'creds')
         self.assertEqual(self.reporter.branch, 'branch')
         self.assertEqual(self.reporter.repo_path, 'repo-path')

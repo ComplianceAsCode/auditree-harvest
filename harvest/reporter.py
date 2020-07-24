@@ -29,8 +29,7 @@ class BaseReporter(object):
 
     def __init__(
         self,
-        org,
-        repo,
+        repo_url,
         creds,
         branch,
         repo_path=None,
@@ -39,8 +38,7 @@ class BaseReporter(object):
         **config
     ):
         """Construct the reporter object."""
-        self.org = org
-        self.repo = repo
+        self.repo_url = repo_url
         self.creds = creds
         self.branch = branch
         self.repo_path = repo_path
@@ -56,7 +54,7 @@ class BaseReporter(object):
 
     def get_file_content(self, filepath, file_dt=None):
         """
-        Retrieve file content for a given file and date from a GHE repo.
+        Retrieve file content for a given file and date from a git repository.
 
         :param str filepath: The relative path to the file within the repo
         :param datetime file_dt: The date of the file version
@@ -65,8 +63,7 @@ class BaseReporter(object):
         """
         if not self.collator:
             self.collator = Collator(
-                self.org,
-                self.repo,
+                self.repo_url,
                 self.creds,
                 self.branch,
                 self.repo_path,

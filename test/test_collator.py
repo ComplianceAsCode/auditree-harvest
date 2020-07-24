@@ -31,9 +31,9 @@ class TestCollator(unittest.TestCase):
         """Initialize supporting test objects before each test."""
         creds_mock = MagicMock()
         creds_mock.token = 'foo-ghe-token'
-        self.creds = {'github_enterprise': creds_mock}
+        self.creds = {'github': creds_mock}
 
-        self.args = ['org-foo', 'repo-foo', self.creds, 'master']
+        self.args = ['https://github.com/foo/bar', self.creds, 'master']
 
         commit_foo_mock = create_autospec(Commit)
         commit_foo_mock.hexsha = 'foo-hexsha'
@@ -49,8 +49,10 @@ class TestCollator(unittest.TestCase):
     def test_constructor_default(self):
         """Ensures collate object is constructed with default branch."""
         collator = Collator(*self.args)
-        self.assertEqual(collator.org, 'org-foo')
-        self.assertEqual(collator.repo, 'repo-foo')
+        self.assertEqual(collator.scheme, 'https')
+        self.assertEqual(collator.hostname, 'github.com')
+        self.assertEqual(collator.org, 'foo')
+        self.assertEqual(collator.repo, 'bar')
         self.assertEqual(collator.creds, self.creds)
         self.assertEqual(collator.branch, 'master')
         self.assertIsNone(collator.repo_path)
@@ -59,8 +61,10 @@ class TestCollator(unittest.TestCase):
     def test_constructor_with_repo_path(self):
         """Ensures collate object is constructed as expected."""
         collator = Collator(*self.args, 'my/repo/path')
-        self.assertEqual(collator.org, 'org-foo')
-        self.assertEqual(collator.repo, 'repo-foo')
+        self.assertEqual(collator.scheme, 'https')
+        self.assertEqual(collator.hostname, 'github.com')
+        self.assertEqual(collator.org, 'foo')
+        self.assertEqual(collator.repo, 'bar')
         self.assertEqual(collator.creds, self.creds)
         self.assertEqual(collator.branch, 'master')
         self.assertEqual(collator.repo_path, 'my/repo/path')
@@ -161,27 +165,11 @@ class TestCollator(unittest.TestCase):
         collator.checkout()
 
         is_dir_mock.assert_called_once_with(
-            '/'.join(
-                [
-                    tempfile.gettempdir(),
-                    'harvest',
-                    'org-foo',
-                    'repo-foo',
-                    '.git'
-                ]
-            )
+            '/'.join([tempfile.gettempdir(), 'harvest', 'foo', 'bar', '.git'])
         )
         clone_from_mock.assert_called_once_with(
-            '/'.join(
-                [
-                    'https://foo-ghe-token:x-oauth-basic@github.ibm.com',
-                    'org-foo',
-                    'repo-foo.git'
-                ]
-            ),
-            '/'.join(
-                [tempfile.gettempdir(), 'harvest', 'org-foo', 'repo-foo']
-            ),
+            'https://foo-ghe-token@github.com/foo/bar.git',
+            '/'.join([tempfile.gettempdir(), 'harvest', 'foo', 'bar']),
             branch='master'
         )
         self.assertEqual(collator.git_repo, 'my-cloned-repo')
@@ -206,20 +194,10 @@ class TestCollator(unittest.TestCase):
         collator.checkout()
 
         is_dir_mock.assert_called_once_with(
-            '/'.join(
-                [
-                    tempfile.gettempdir(),
-                    'harvest',
-                    'org-foo',
-                    'repo-foo',
-                    '.git'
-                ]
-            )
+            '/'.join([tempfile.gettempdir(), 'harvest', 'foo', 'bar', '.git'])
         )
         repo_mock.assert_called_once_with(
-            '/'.join(
-                [tempfile.gettempdir(), 'harvest', 'org-foo', 'repo-foo']
-            )
+            '/'.join([tempfile.gettempdir(), 'harvest', 'foo', 'bar'])
         )
         self.assertEqual(collator.git_repo, mock_repo)
         mock_fetch.assert_called_once_with()
@@ -239,7 +217,7 @@ class TestCollator(unittest.TestCase):
         mock_remote.clone_from = mock_clone_from
         mock_repo.remote.return_value = mock_remote
         mock_origin = MagicMock()
-        mock_origin.url = 'git@github.ibm.com:org-foo/repo-foo.git'
+        mock_origin.url = 'git@github.com:foo/bar.git'
         mock_remotes = MagicMock()
         mock_remotes.origin = mock_origin
         mock_repo.remotes = mock_remotes
@@ -267,7 +245,7 @@ class TestCollator(unittest.TestCase):
         mock_remote.clone_from = mock_clone_from
         mock_repo.remote.return_value = mock_remote
         mock_origin = MagicMock()
-        mock_origin.url = 'git@github.ibm.com:org-bar/repo-bar.git'
+        mock_origin.url = 'git@github.com:bar/foo.git'
         mock_remotes = MagicMock()
         mock_remotes.origin = mock_origin
         mock_repo.remotes = mock_remotes
@@ -282,6 +260,4 @@ class TestCollator(unittest.TestCase):
             mock_pull.assert_not_called()
             mock_clone_from.assert_not_called()
 
-        self.assertEqual(
-            str(cm.exception), 'org-foo/repo-foo repository mismatch'
-        )
+        self.assertEqual(str(cm.exception), 'foo/bar repository mismatch')

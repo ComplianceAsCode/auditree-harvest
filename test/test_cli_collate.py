@@ -34,7 +34,7 @@ class TestHarvestCLICollate(unittest.TestCase):
         """Ensures collate sub-command works when no dates provided."""
         mock_read.return_value = ['commit-foo']
         self.harvest.run(
-            ['collate', 'foo-org', 'bar-repo', 'my/path/baz.json']
+            ['collate', 'https://github.com/foo/bar', 'my/path/baz.json']
         )
         today = datetime.today()
 
@@ -53,8 +53,7 @@ class TestHarvestCLICollate(unittest.TestCase):
         self.harvest.run(
             [
                 'collate',
-                'foo-org',
-                'bar-repo',
+                'https://github.com/foo/bar',
                 'my/path/baz.json',
                 '--repo-path',
                 'os/repo/path'
@@ -77,8 +76,7 @@ class TestHarvestCLICollate(unittest.TestCase):
         self.harvest.run(
             [
                 'collate',
-                'foo-org',
-                'bar-repo',
+                'https://github.com/foo/bar',
                 'my/path/baz.json',
                 '--start',
                 '20191020'
@@ -102,8 +100,7 @@ class TestHarvestCLICollate(unittest.TestCase):
         self.harvest.run(
             [
                 'collate',
-                'foo-org',
-                'bar-repo',
+                'https://github.com/foo/bar',
                 'my/path/baz.json',
                 '--end',
                 '20191020'
@@ -124,8 +121,7 @@ class TestHarvestCLICollate(unittest.TestCase):
         self.harvest.run(
             [
                 'collate',
-                'foo-org',
-                'bar-repo',
+                'https://github.com/foo/bar',
                 'my/path/baz.json',
                 '--start',
                 '20191020',
@@ -148,8 +144,7 @@ class TestHarvestCLICollate(unittest.TestCase):
         self.harvest.run(
             [
                 'collate',
-                'foo-org',
-                'bar-repo',
+                'https://github.com/foo/bar',
                 'my/path/baz.json',
                 '--start',
                 '20191120',
@@ -171,8 +166,7 @@ class TestHarvestCLICollate(unittest.TestCase):
         self.harvest.run(
             [
                 'collate',
-                'foo-org',
-                'bar-repo',
+                'https://github.com/foo/bar',
                 'my/path/baz.json',
                 '--start',
                 '20191120',
@@ -190,8 +184,7 @@ class TestHarvestCLICollate(unittest.TestCase):
         self.harvest.run(
             [
                 'collate',
-                'foo-org',
-                'bar-repo',
+                'https://github.com/foo/bar',
                 'my/path/baz.json',
                 '--start',
                 (datetime.today() + timedelta(days=1)).strftime('%Y%m%d')
@@ -207,8 +200,7 @@ class TestHarvestCLICollate(unittest.TestCase):
         self.harvest.run(
             [
                 'collate',
-                'foo-org',
-                'bar-repo',
+                'https://github.com/foo/bar',
                 'my/path/baz.json',
                 '--start',
                 '20191120',

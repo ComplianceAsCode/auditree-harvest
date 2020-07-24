@@ -16,6 +16,7 @@
 import os
 import tempfile
 from datetime import datetime, timedelta
+from urllib.parse import urlparse
 
 import git
 
@@ -25,12 +26,12 @@ from harvest.exceptions import FileMissingError
 class Collator(object):
     """Harvest collator to retrieve Git repository content."""
 
-    def __init__(
-        self, org, repo, creds, branch, repo_path=None, validate=True
-    ):
+    def __init__(self, repo_url, creds, branch, repo_path=None, validate=True):
         """Construct the Collator object."""
-        self.org = org
-        self.repo = repo
+        parsed = urlparse(repo_url)
+        self.scheme = parsed.scheme
+        self.hostname = parsed.hostname
+        self.org, self.repo = parsed.path.strip('/').split('/')
         self.creds = creds
         self.branch = branch
         self.repo_path = repo_path
@@ -107,12 +108,28 @@ class Collator(object):
             self.git_repo.remote().fetch()
             self.git_repo.remote().pull()
         else:
-            auth = f'{self.creds["github_enterprise"].token}:x-oauth-basic@'
-            self.git_repo = git.Repo.clone_from(
-                f'https://{auth}github.ibm.com/{self.org}/{self.repo}.git',
-                local_path,
-                branch=self.branch
-            )
+            token = None
+            if 'github.com' in self.hostname:
+                token = self.creds['github'].token
+            elif 'github' in self.hostname:
+                token = self.creds['github_enterprise'].token
+            elif 'bitbucket' in self.hostname:
+                token = self.creds['bitbucket'].token
+            elif 'gitlab' in self.hostname:
+                token = self.creds['gitlab'].token
+            url_path = f'{self.hostname}/{self.org}/{self.repo}.git'
+            try:
+                self.git_repo = git.Repo.clone_from(
+                    f'{self.scheme}://{token}@{url_path}',
+                    local_path,
+                    branch=self.branch
+                )
+            except git.exc.GitCommandError as e:
+                raise git.exc.GitCommandError(
+                    [c.replace(token, f'{"":*<10}') for c in e.command],
+                    e.status,
+                    e.stderr.strip('\n')
+                ) from None
 
     def _valid_repo(self):
         remote_url = self.git_repo.remotes.origin.url
