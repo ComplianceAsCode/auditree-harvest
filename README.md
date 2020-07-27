@@ -38,7 +38,7 @@ or
 python3 --version
 ```
 
-The `harvest` tool is available for download from [PyPI](https://pypi.org/).
+The `harvest` tool is available for download from [PyPI](https://pypi.org/project/auditree-harvest/).
 
 ## Installation
 
@@ -234,5 +234,5 @@ it will handle the rest.
 [pps-rpt-tmpl]: https://github.com/ComplianceAsCode/auditree-harvest/blob/main/auditree_arboretum/provider/auditree/reports/report_templates/python_packages_summary.md.tmpl
 [pre-commit-badge]: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
 [pre-commit]: https://github.com/pre-commit/pre-commit
-[lint-test]: https://github.com/ComplianceAsCode/auditree-harvest/actions?query=workflow%3A%22Test+python+code+%26+lint%22
-[pypi-upload]: https://github.com/ComplianceAsCode/auditree-harvest/actions?query=workflow%3A%22Upload+Python+Package%22
+[lint-test]: https://github.com/ComplianceAsCode/auditree-harvest/actions?query=workflow%3A%22format+%7C+lint+%7C+test%22
+[pypi-upload]: https://github.com/ComplianceAsCode/auditree-harvest/actions?query=workflow%3A%22PyPI+upload%22
