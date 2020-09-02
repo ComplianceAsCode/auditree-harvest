@@ -42,14 +42,15 @@ class _CoreHarvestCommand(Command):
             'repo',
             help=(
                 'the URL to the repository containing files to be processed '
-                'by harvest, as an example https://github.com/my-org/my-repo'
+                'by harvest, as an example: https://github.com/my-org/my-repo '
+                'or: local - if working exclusively with a local git repo'
             )
         )
         self.add_argument(
             '--repo-path',
             help=(
                 'the operating system location of a local git repository - '
-                'if not provided, repo will be cloned to $TMPDIR/harvest'
+                'if not provided, repo path is assumed to be $TMPDIR/harvest'
             ),
             metavar='~/path/git-repo',
             default=None
@@ -65,6 +66,11 @@ class _CoreHarvestCommand(Command):
         )
 
     def _validate_arguments(self, args):
+        if args.repo == 'local':
+            if not args.repo_path:
+                return 'ERROR: --repo-path expected for "local" mode'
+            args.repo = 'https://local/local/local'
+            args.no_validate = False
         parsed = urlparse(args.repo)
         if not (parsed.scheme and parsed.hostname and parsed.path):
             return (
