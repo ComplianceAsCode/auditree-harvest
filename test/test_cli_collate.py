@@ -210,3 +210,26 @@ class TestHarvestCLICollate(unittest.TestCase):
         )
         mock_read.assert_not_called()
         mock_write.assert_not_called()
+
+    @patch('harvest.collator.Collator.write')
+    @patch('harvest.collator.Collator.read')
+    def test_collate_local(self, mock_read, mock_write):
+        """Ensures collate sub-command works when 'local' repo provided."""
+        mock_read.return_value = ['commit-foo']
+        self.harvest.run(
+            [
+                'collate',
+                'local',
+                'my/path/baz.json',
+                '--repo-path',
+                'os/repo/path'
+            ]
+        )
+        today = datetime.today()
+
+        mock_read.assert_called_once_with(
+            'my/path/baz.json',
+            datetime(today.year, today.month, today.day),
+            datetime(today.year, today.month, today.day)
+        )
+        mock_write.assert_called_once_with('my/path/baz.json', ['commit-foo'])
