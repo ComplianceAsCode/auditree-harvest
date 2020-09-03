@@ -1,3 +1,7 @@
+# 1.1.1
+
+- [FIXED] Credentials are no longer expected when running in local repo mode.
+
 # 1.1.0
 
 - [NEW] "local" `repo` positional argument option is now valid bypassing remote validation.

@@ -68,9 +68,10 @@ class _CoreHarvestCommand(Command):
     def _validate_arguments(self, args):
         if args.repo == 'local':
             if not args.repo_path:
-                return 'ERROR: --repo-path expected for "local" mode'
+                return 'ERROR: --repo-path required when using local repo mode'
             args.repo = 'https://local/local/local'
             args.no_validate = False
+            args.creds = None
         parsed = urlparse(args.repo)
         if not (parsed.scheme and parsed.hostname and parsed.path):
             return (
@@ -129,7 +130,7 @@ class Collate(_CoreHarvestCommand):
     def _run(self, args):
         collator = Collator(
             args.repo,
-            Config(args.creds),
+            Config(args.creds) if args.creds else None,
             'master',
             args.repo_path,
             args.no_validate
@@ -187,7 +188,7 @@ class Report(_CoreHarvestCommand):
     def _run(self, args):
         reporter = self.report(
             args.repo,
-            Config(args.creds),
+            Config(args.creds) if args.creds else None,
             'master',
             args.repo_path,
             self.template_dir,
