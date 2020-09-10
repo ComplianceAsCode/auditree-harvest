@@ -1,6 +1,8 @@
 # Contributing
 
-If you want to add to harvest, please familiarise yourself with the code & our [Coding Standards][]. Before you submit a PR, please [file an issue][new collab] to request collaborator access.
+If you want to add to harvest, please familiarize yourself with the code & our [Coding Standards][]. Make a fork of the repository & file a Pull Request from your fork with the changes. You will need to click the checkbox in the template to show you agree to the [Developer Certificate of Origin](../blob/main/DCO1.1.txt).
+
+If you make **regular & substantial contributions** to Auditree, you may want to become a collaborator. This means you can approve pull requests (though not your own) & create releases of the tool. Please [file an issue][new collab] to request collaborator access. A collaborator supports the project, ensuring coding standards are met & best practices are followed in contributed code, cutting & documenting releases, promoting the project etc.
 
 If you would like to contribute reports, either add them via PR to [Arboretum][] or push to your own repository & let us know of its existence.
 
@@ -45,6 +47,6 @@ example `[ADDED]`, `[CHANGED]`, etc.
 [semver]: https://semver.org/
 [changelog]: https://keepachangelog.com/en/1.0.0/#how
 [Arboretum]: https://github.com/ComplianceAsCode/auditree-arboretum
-[Coding Standards]: https://github.com/ComplianceAsCode/auditree-framework/blob/master/doc/coding-standards.rst
+[Coding Standards]: https://complianceascode.github.io/auditree-framework/coding-standards.html
 [generating reports]: https://github.com/ComplianceAsCode/auditree-harvest#generate-reports
 [new collab]: https://github.com/ComplianceAsCode/auditree-harvest/issues/new?template=new-collaborator.md
