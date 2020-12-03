@@ -17,6 +17,7 @@
 import tempfile
 import unittest
 from datetime import datetime
+from pathlib import PurePath
 from unittest.mock import MagicMock, call, create_autospec, mock_open, patch
 
 from git import Commit, Remote, Repo
@@ -57,6 +58,10 @@ class TestCollator(unittest.TestCase):
         self.assertEqual(collator.branch, 'master')
         self.assertIsNone(collator.repo_path)
         self.assertIsNone(collator.git_repo)
+        tmpdir = PurePath(tempfile.gettempdir())
+        self.assertEqual(
+            collator.local_path, str(tmpdir.joinpath('harvest', 'foo', 'bar'))
+        )
 
     def test_constructor_with_repo_path(self):
         """Ensures collate object is constructed as expected."""
@@ -69,6 +74,7 @@ class TestCollator(unittest.TestCase):
         self.assertEqual(collator.branch, 'master')
         self.assertEqual(collator.repo_path, 'my/repo/path')
         self.assertIsNone(collator.git_repo)
+        self.assertEqual(collator.local_path, 'my/repo/path')
 
     def test_read_date_comparison(self):
         """Ensures read returns commits when date logic triggers completion."""

@@ -14,8 +14,10 @@
 # limitations under the License.
 """Harvest file collator."""
 import os
+import shutil
 import tempfile
 from datetime import datetime, timedelta
+from pathlib import PurePath
 from urllib.parse import urlparse
 
 import git
@@ -37,6 +39,14 @@ class Collator(object):
         self.repo_path = repo_path
         self.git_repo = None
         self.validate = validate
+
+    @property
+    def local_path(self):
+        """Provide the local OS path to the Git repo."""
+        if self.repo_path:
+            return self.repo_path
+        tmpdir = PurePath(tempfile.gettempdir())
+        return str(tmpdir.joinpath('harvest', self.org, self.repo))
 
     def read(self, filepath, from_dt, until_dt):
         """
@@ -93,43 +103,43 @@ class Collator(object):
                 f.write(commit.tree[filepath].data_stream.read().decode())
 
     def checkout(self):
-        """Establish/Refresh the local git repository."""
+        """Establish/Refresh the local Git repository."""
         if self.repo_path and not self.git_repo:
             self.git_repo = git.Repo(self.repo_path)
         if self.git_repo:
             if self.validate and not self._valid_repo():
                 raise ValueError(f'{self.org}/{self.repo} repository mismatch')
             return
-        local_path = os.path.join(
-            tempfile.gettempdir(), 'harvest', self.org, self.repo
-        )
-        if os.path.isdir(os.path.join(local_path, '.git')):
-            self.git_repo = git.Repo(local_path)
-            self.git_repo.remote().fetch()
-            self.git_repo.remote().pull()
-        else:
-            token = None
-            if 'github.com' in self.hostname:
-                token = self.creds['github'].token
-            elif 'github' in self.hostname:
-                token = self.creds['github_enterprise'].token
-            elif 'bitbucket' in self.hostname:
-                token = self.creds['bitbucket'].token
-            elif 'gitlab' in self.hostname:
-                token = self.creds['gitlab'].token
-            url_path = f'{self.hostname}/{self.org}/{self.repo}.git'
+        if os.path.isdir(os.path.join(self.local_path, '.git')):
             try:
-                self.git_repo = git.Repo.clone_from(
-                    f'{self.scheme}://{token}@{url_path}',
-                    local_path,
-                    branch=self.branch
-                )
-            except git.exc.GitCommandError as e:
-                raise git.exc.GitCommandError(
-                    [c.replace(token, f'{"":*<10}') for c in e.command],
-                    e.status,
-                    e.stderr.strip('\n')
-                ) from None
+                self.git_repo = git.Repo(self.local_path)
+                self.git_repo.remote().fetch()
+                self.git_repo.remote().pull()
+                return
+            except git.exc.InvalidGitRepositoryError:
+                shutil.rmtree(self.local_path)
+        token = None
+        if 'github.com' in self.hostname:
+            token = self.creds['github'].token
+        elif 'github' in self.hostname:
+            token = self.creds['github_enterprise'].token
+        elif 'bitbucket' in self.hostname:
+            token = self.creds['bitbucket'].token
+        elif 'gitlab' in self.hostname:
+            token = self.creds['gitlab'].token
+        url_path = f'{self.hostname}/{self.org}/{self.repo}.git'
+        try:
+            self.git_repo = git.Repo.clone_from(
+                f'{self.scheme}://{token}@{url_path}',
+                self.local_path,
+                branch=self.branch
+            )
+        except git.exc.GitCommandError as e:
+            raise git.exc.GitCommandError(
+                [c.replace(token, f'{"":*<10}') for c in e.command],
+                e.status,
+                e.stderr.strip('\n')
+            ) from None
 
     def _valid_repo(self):
         remote_url = self.git_repo.remotes.origin.url

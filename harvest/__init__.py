@@ -14,4 +14,4 @@
 # limitations under the License.
 """The Auditree file collating and reporting tool."""
 
-__version__ = '1.1.1'
+__version__ = '1.2.0'
