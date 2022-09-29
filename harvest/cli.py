@@ -95,7 +95,7 @@ class Collate(_CoreHarvestCommand):
                 "the end of date range for the file you wish to retrieve - "
                 "defaults to the current date"
             ),
-            metavar="YYYYMMDD",
+            metavar="YYYY-MM-DD or YYYYMMDD",
             default=False,
         )
         self.add_argument(
@@ -104,17 +104,23 @@ class Collate(_CoreHarvestCommand):
                 "the start of date range for the file you wish to retrieve - "
                 "defaults to same value as the end of date range"
             ),
-            metavar="YYYYMMDD",
+            metavar="YYYY-MM-DD or YYYYMMDD",
             default=False,
         )
 
     def _validate_arguments(self, args):
         if not args.end:
-            args.end = datetime.today().strftime("%Y%m%d")
+            args.end = datetime.today().strftime("%Y-%m-%d")
         if not args.start:
             args.start = args.end
-        args.start = datetime.strptime(args.start, "%Y%m%d")
-        args.end = datetime.strptime(args.end, "%Y%m%d")
+        if "-" in args.start:
+            args.start = datetime.strptime(args.start, "%Y-%m-%d")
+        else:
+            args.start = datetime.strptime(args.start, "%Y%m%d")
+        if "-" in args.end:
+            args.end = datetime.strptime(args.end, "%Y-%m-%d")
+        else:
+            args.end = datetime.strptime(args.end, "%Y%m%d")
         if args.start > datetime.today():
             return "ERROR: start date cannot be in the future"
         if args.start > args.end:
