@@ -30,7 +30,7 @@ class TestCollator(unittest.TestCase):
     def setUp(self):
         """Initialize supporting test objects before each test."""
         creds_mock = MagicMock()
-        creds_mock.token = "foo-ghe-token"
+        creds_mock.token = "foo-ghe-token"  # nosec B105: this is not a real token
         self.creds = {"github": creds_mock}
 
         self.args = ["https://github.com/foo/bar", self.creds, "master"]
