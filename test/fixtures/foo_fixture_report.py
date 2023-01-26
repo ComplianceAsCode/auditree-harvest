@@ -1,4 +1,3 @@
-# -*- mode:python; coding:utf-8 -*-
 # Copyright (c) 2020 IBM Corp. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,8 +26,8 @@ class FooFixtureReport(BaseReporter):
     @property
     def report_filename(self):
         """Return the report filename."""
-        return 'foo_fixture_report.csv'
+        return "foo_fixture_report.csv"
 
     def generate_report(self):
         """Generate content."""
-        return [{'FOO': 'foo', 'BAR': 'bar'}]
+        return [{"FOO": "foo", "BAR": "bar"}]

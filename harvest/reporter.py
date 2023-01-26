@@ -1,4 +1,3 @@
-# -*- mode:python; coding:utf-8 -*-
 # Copyright (c) 2020 IBM Corp. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,7 +34,7 @@ class BaseReporter(object):
         repo_path=None,
         template_dir=None,
         validate=True,
-        **config
+        **config,
     ):
         """Construct the reporter object."""
         self.repo_url = repo_url
@@ -50,7 +49,7 @@ class BaseReporter(object):
     @property
     def report_filename(self):
         """Override in sub-class to an appropriate filename."""
-        return f'{self.__class__.__name__}.txt'
+        return f"{self.__class__.__name__}.txt"
 
     def get_file_content(self, filepath, file_dt=None):
         """
@@ -63,36 +62,28 @@ class BaseReporter(object):
         """
         if not self.collator:
             self.collator = Collator(
-                self.repo_url,
-                self.creds,
-                self.branch,
-                self.repo_path,
-                self.validate
+                self.repo_url, self.creds, self.branch, self.repo_path, self.validate
             )
         if not file_dt:
             file_dt = datetime.today()
         if file_dt > datetime.today():
-            raise ValueError(
-                f'{file_dt.strftime("%Y-%m-%d")} is in the future'
-            )
+            raise ValueError(f'{file_dt.strftime("%Y-%m-%d")} is in the future')
         commits = None
         try:
             commits = self.collator.read(
                 filepath,
                 datetime(file_dt.year, file_dt.month, file_dt.day),
-                datetime(file_dt.year, file_dt.month, file_dt.day)
+                datetime(file_dt.year, file_dt.month, file_dt.day),
             )
         except FileMissingError:
             pass
-        return (
-            commits[0].tree[filepath].data_stream.read() if commits else None
-        )
+        return commits[0].tree[filepath].data_stream.read() if commits else None
 
     def generate_report(self):
         """Stub method for custom report generation by sub-classes."""
-        raise NotImplementedError('Method implemented by sub-classes')
+        raise NotImplementedError("Method implemented by sub-classes")
 
-    def write(self, raw_content, location='.'):
+    def write(self, raw_content, location="."):
         """
         Create report artifact.
 
@@ -101,13 +92,11 @@ class BaseReporter(object):
         if not raw_content:
             return
         rpt_content = self._format_content(raw_content)
-        with open(os.path.join(location, self.report_filename), 'w+') as f:
+        with open(os.path.join(location, self.report_filename), "w+") as f:
             write_func = f.write
-            is_csv = self.report_filename.rsplit('.', 1).pop().lower() == 'csv'
+            is_csv = self.report_filename.rsplit(".", 1).pop().lower() == "csv"
             if is_csv and isinstance(rpt_content, list):
-                csv_writer = csv.DictWriter(
-                    f, fieldnames=rpt_content[0].keys()
-                )
+                csv_writer = csv.DictWriter(f, fieldnames=rpt_content[0].keys())
                 csv_writer.writeheader()
                 write_func = csv_writer.writerow
             if isinstance(rpt_content, list):
@@ -118,14 +107,14 @@ class BaseReporter(object):
 
     def _format_content(self, raw_content):
         template_env = None
-        template_file = f'{self.report_filename}.tmpl'
+        template_file = f"{self.report_filename}.tmpl"
         for dirname, _, files in os.walk(self.template_dir):
             if template_file in files:
                 template_env = Environment(
                     loader=FileSystemLoader(searchpath=dirname),
                     trim_blocks=True,
                     lstrip_blocks=True,
-                    autoescape=True
+                    autoescape=True,
                 )
                 break
         if not template_env:

@@ -1,4 +1,3 @@
-# -*- mode:python; coding:utf-8 -*-
 # Copyright (c) 2020 IBM Corp. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,7 +32,7 @@ class Collator(object):
         parsed = urlparse(repo_url)
         self.scheme = parsed.scheme
         self.hostname = parsed.hostname
-        self.org, self.repo = parsed.path.strip('/').split('/')
+        self.org, self.repo = parsed.path.strip("/").split("/")
         self.creds = creds
         self.branch = branch
         self.repo_path = repo_path
@@ -46,7 +45,7 @@ class Collator(object):
         if self.repo_path:
             return self.repo_path
         tmpdir = PurePath(tempfile.gettempdir())
-        return str(tmpdir.joinpath('harvest', self.org, self.repo))
+        return str(tmpdir.joinpath("harvest", self.org, self.repo))
 
     def read(self, filepath, from_dt, until_dt):
         """
@@ -75,16 +74,14 @@ class Collator(object):
                 )
                 commits.append(commit)
                 current_date = datetime.strptime(
-                    self._ts_to_str(commit.committed_date), '%Y%m%d'
+                    self._ts_to_str(commit.committed_date), "%Y%m%d"
                 )
             except StopIteration:
                 break
         if not commits:
-            until = until_dt.strftime('%Y-%m-%d')
-            since = from_dt.strftime('%Y-%m-%d')
-            raise FileMissingError(
-                f'{filepath} not found between {since} and {until}'
-            )
+            until = until_dt.strftime("%Y-%m-%d")
+            since = from_dt.strftime("%Y-%m-%d")
+            raise FileMissingError(f"{filepath} not found between {since} and {until}")
         return commits
 
     def write(self, filepath, commits):
@@ -96,10 +93,10 @@ class Collator(object):
         """
         for commit in commits:
             file_name = (
-                f'./{self._ts_to_str(commit.committed_date)}_'
+                f"./{self._ts_to_str(commit.committed_date)}_"
                 f'{filepath.rsplit("/", 1).pop()}'
             )
-            with open(file_name, 'w+') as f:
+            with open(file_name, "w+") as f:
                 f.write(commit.tree[filepath].data_stream.read().decode())
 
     def checkout(self):
@@ -108,9 +105,9 @@ class Collator(object):
             self.git_repo = git.Repo(self.repo_path)
         if self.git_repo:
             if self.validate and not self._valid_repo():
-                raise ValueError(f'{self.org}/{self.repo} repository mismatch')
+                raise ValueError(f"{self.org}/{self.repo} repository mismatch")
             return
-        if os.path.isdir(os.path.join(self.local_path, '.git')):
+        if os.path.isdir(os.path.join(self.local_path, ".git")):
             try:
                 self.git_repo = git.Repo(self.local_path)
                 self.git_repo.remote().fetch()
@@ -119,32 +116,32 @@ class Collator(object):
             except git.exc.InvalidGitRepositoryError:
                 shutil.rmtree(self.local_path)
         token = None
-        if 'github.com' in self.hostname:
-            token = self.creds['github'].token
-        elif 'github' in self.hostname:
-            token = self.creds['github_enterprise'].token
-        elif 'bitbucket' in self.hostname:
-            token = self.creds['bitbucket'].token
-        elif 'gitlab' in self.hostname:
-            token = self.creds['gitlab'].token
-        url_path = f'{self.hostname}/{self.org}/{self.repo}.git'
+        if "github.com" in self.hostname:
+            token = self.creds["github"].token
+        elif "github" in self.hostname:
+            token = self.creds["github_enterprise"].token
+        elif "bitbucket" in self.hostname:
+            token = self.creds["bitbucket"].token
+        elif "gitlab" in self.hostname:
+            token = self.creds["gitlab"].token
+        url_path = f"{self.hostname}/{self.org}/{self.repo}.git"
         try:
             self.git_repo = git.Repo.clone_from(
-                f'{self.scheme}://{token}@{url_path}',
+                f"{self.scheme}://{token}@{url_path}",
                 self.local_path,
-                branch=self.branch
+                branch=self.branch,
             )
         except git.exc.GitCommandError as e:
             raise git.exc.GitCommandError(
                 [c.replace(token, f'{"":*<10}') for c in e.command],
                 e.status,
-                e.stderr.strip('\n')
+                e.stderr.strip("\n"),
             ) from None
 
     def _valid_repo(self):
         remote_url = self.git_repo.remotes.origin.url
-        *_, org, repo = remote_url.split('.git').pop(0).rsplit('/', 2)
-        return self.org == org.split(':').pop() and self.repo == repo
+        *_, org, repo = remote_url.split(".git").pop(0).rsplit("/", 2)
+        return self.org == org.split(":").pop() and self.repo == repo
 
     def _ts_to_str(self, timestamp):
-        return datetime.fromtimestamp(timestamp).strftime('%Y%m%d')
+        return datetime.fromtimestamp(timestamp).strftime("%Y%m%d")
