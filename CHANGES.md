@@ -1,3 +1,7 @@
+# [1.2.1](https://github.com/ComplianceAsCode/auditree-harvest/releases/tag/v1.2.1)
+
+- [CHANGED] Removed yapf in favour of black as code formatter.
+
 # [1.2.0](https://github.com/ComplianceAsCode/auditree-harvest/releases/tag/v1.2.0)
 
 - [FIXED] Invalid Git repo error is now handled by a refresh of the local Git repo.

@@ -17,6 +17,8 @@
 develop:
 	pip install -q -e .[dev] --upgrade --upgrade-strategy eager
 	pre-commit install
+
+update-pre-commit:
 	pre-commit autoupdate
 
 install:
@@ -27,7 +29,7 @@ uninstall:
 	pip uninstall auditree-harvest
 
 code-format:
-	pre-commit run yapf --all-files
+	pre-commit run black --all-files
 
 code-lint:
 	pre-commit run flake8 --all-files
