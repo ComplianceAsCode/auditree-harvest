@@ -1,4 +1,3 @@
-# -*- mode:python; coding:utf-8 -*-
 # Copyright (c) 2020 IBM Corp. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,7 +30,7 @@ def get_report_module(package, report):
 
     :returns: the report module object
     """
-    rpt_module_filename = f'{report}.py'
+    rpt_module_filename = f"{report}.py"
     for dirname, _, files in os.walk(import_module(package).__path__[0]):
         if rpt_module_filename in files:
             file_location = os.path.join(dirname, rpt_module_filename)
@@ -52,7 +51,7 @@ def get_report_modules(package):
     rpt_modules = []
     for dirname, _, files in os.walk(import_module(package).__path__[0]):
         for file in files:
-            if not file.endswith('.py') or file == '__init__.py':
+            if not file.endswith(".py") or file == "__init__.py":
                 continue
             try:
                 file_location = os.path.join(dirname, file)
@@ -75,9 +74,12 @@ def get_report_classes(report):
     :returns: a list of report class objects found in the report module
     """
     return [
-        obj for (name, obj) in inspect.getmembers(report) if (
-            inspect.isclass(obj) and issubclass(obj, BaseReporter)
-            and name != 'BaseReporter'
+        obj
+        for (name, obj) in inspect.getmembers(report)
+        if (
+            inspect.isclass(obj)
+            and issubclass(obj, BaseReporter)
+            and name != "BaseReporter"
         )
     ]
 
@@ -90,9 +92,7 @@ def get_report_details(report):
 
     :returns: the docstring for the given report module
     """
-    return [
-        obj for name, obj in inspect.getmembers(report) if name == '__doc__'
-    ][0]
+    return [obj for name, obj in inspect.getmembers(report) if name == "__doc__"][0]
 
 
 def get_report_summary(report):
@@ -107,7 +107,7 @@ def get_report_summary(report):
     details = get_report_details(report)
     if not details:
         return
-    details = details.split('\n')
+    details = details.split("\n")
     while details and not summary:
         summary = details.pop(0)
     return summary
