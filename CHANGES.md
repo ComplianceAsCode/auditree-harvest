@@ -1,3 +1,8 @@
+# [1.3.0](https://github.com/ComplianceAsCode/auditree-harvest/releases/tag/v1.3.0)
+
+- [ADDED] Added option to use the date format YYYY-MM-DD in addition to YYYYMMDD when collating files.
+- [ADDED] Made it possible to collate multiple files during a single run.
+
 # [1.2.1](https://github.com/ComplianceAsCode/auditree-harvest/releases/tag/v1.2.1)
 
 - [CHANGED] Removed yapf in favour of black as code formatter.
