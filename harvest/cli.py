@@ -88,6 +88,7 @@ class Collate(_CoreHarvestCommand):
                 "the relative path to a file in a git repository "
                 "that you wish to retrieve"
             ),
+            nargs="+",
         )
         self.add_argument(
             "--end",
@@ -137,12 +138,12 @@ class Collate(_CoreHarvestCommand):
             args.repo_path,
             args.no_validate,
         )
-        try:
-            collator.write(
-                args.filepath, collator.read(args.filepath, args.start, args.end)
-            )
-        except ValueError as e:
-            self.err(f"ERROR: {str(e)}")
+
+        for file in args.filepath:
+            try:
+                collator.write(file, collator.read(file, args.start, args.end))
+            except ValueError as e:
+                self.err(f"ERROR: {str(e)}")
 
 
 class Report(_CoreHarvestCommand):

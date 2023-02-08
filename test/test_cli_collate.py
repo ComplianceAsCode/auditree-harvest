@@ -15,7 +15,7 @@
 
 import unittest
 from datetime import datetime, timedelta
-from unittest.mock import patch
+from unittest.mock import call, patch
 
 from harvest.cli import Harvest
 
@@ -41,6 +41,42 @@ class TestHarvestCLICollate(unittest.TestCase):
             datetime(today.year, today.month, today.day),
         )
         mock_write.assert_called_once_with("my/path/baz.json", ["commit-foo"])
+
+    @patch("harvest.collator.Collator.write")
+    @patch("harvest.collator.Collator.read")
+    def test_collate_multiple_paths(self, mock_read, mock_write):
+        """Ensures collate sub-command works when no dates provided."""
+        mock_read.return_value = ["commit-foo"]
+        self.harvest.run(
+            [
+                "collate",
+                "https://github.com/foo/bar",
+                "my/path/baz.json",
+                "my/path/bar.json",
+            ]
+        )
+        today = datetime.today()
+
+        mock_read.assert_has_calls(
+            [
+                call(
+                    "my/path/baz.json",
+                    datetime(today.year, today.month, today.day),
+                    datetime(today.year, today.month, today.day),
+                ),
+                call(
+                    "my/path/bar.json",
+                    datetime(today.year, today.month, today.day),
+                    datetime(today.year, today.month, today.day),
+                ),
+            ]
+        )
+        mock_write.assert_has_calls(
+            [
+                call("my/path/baz.json", ["commit-foo"]),
+                call("my/path/bar.json", ["commit-foo"]),
+            ]
+        )
 
     @patch("harvest.collator.Collator.write")
     @patch("harvest.collator.Collator.read")
