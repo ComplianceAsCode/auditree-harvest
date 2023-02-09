@@ -15,7 +15,7 @@
 
 import unittest
 from datetime import datetime, timedelta
-from unittest.mock import patch
+from unittest.mock import call, patch
 
 from harvest.cli import Harvest
 
@@ -41,6 +41,42 @@ class TestHarvestCLICollate(unittest.TestCase):
             datetime(today.year, today.month, today.day),
         )
         mock_write.assert_called_once_with("my/path/baz.json", ["commit-foo"])
+
+    @patch("harvest.collator.Collator.write")
+    @patch("harvest.collator.Collator.read")
+    def test_collate_multiple_paths(self, mock_read, mock_write):
+        """Ensures collate sub-command works when no dates provided."""
+        mock_read.return_value = ["commit-foo"]
+        self.harvest.run(
+            [
+                "collate",
+                "https://github.com/foo/bar",
+                "my/path/baz.json",
+                "my/path/bar.json",
+            ]
+        )
+        today = datetime.today()
+
+        mock_read.assert_has_calls(
+            [
+                call(
+                    "my/path/baz.json",
+                    datetime(today.year, today.month, today.day),
+                    datetime(today.year, today.month, today.day),
+                ),
+                call(
+                    "my/path/bar.json",
+                    datetime(today.year, today.month, today.day),
+                    datetime(today.year, today.month, today.day),
+                ),
+            ]
+        )
+        mock_write.assert_has_calls(
+            [
+                call("my/path/baz.json", ["commit-foo"]),
+                call("my/path/bar.json", ["commit-foo"]),
+            ]
+        )
 
     @patch("harvest.collator.Collator.write")
     @patch("harvest.collator.Collator.read")
@@ -76,6 +112,32 @@ class TestHarvestCLICollate(unittest.TestCase):
                 "https://github.com/foo/bar",
                 "my/path/baz.json",
                 "--start",
+                "2019-10-20",
+            ]
+        )
+        today = datetime.today()
+        mock_read.assert_called_once_with(
+            "my/path/baz.json",
+            datetime(2019, 10, 20),
+            datetime(today.year, today.month, today.day),
+        )
+        mock_write.assert_called_once_with(
+            "my/path/baz.json", ["commit-foo", "commit-bar", "commit-baz"]
+        )
+
+    @patch("harvest.collator.Collator.write")
+    @patch("harvest.collator.Collator.read")
+    def test_collate_start_date_only_without_date_seperator(
+        self, mock_read, mock_write
+    ):
+        """Ensures collate sub-command works when only start date provided."""
+        mock_read.return_value = ["commit-foo", "commit-bar", "commit-baz"]
+        self.harvest.run(
+            [
+                "collate",
+                "https://github.com/foo/bar",
+                "my/path/baz.json",
+                "--start",
                 "20191020",
             ]
         )
@@ -92,6 +154,27 @@ class TestHarvestCLICollate(unittest.TestCase):
     @patch("harvest.collator.Collator.write")
     @patch("harvest.collator.Collator.read")
     def test_collate_end_date_only(self, mock_read, mock_write):
+        """Ensures collate sub-command works when only end date provided."""
+        mock_read.return_value = ["commit-foo", "commit-bar", "commit-baz"]
+        self.harvest.run(
+            [
+                "collate",
+                "https://github.com/foo/bar",
+                "my/path/baz.json",
+                "--end",
+                "2019-10-20",
+            ]
+        )
+        mock_read.assert_called_once_with(
+            "my/path/baz.json", datetime(2019, 10, 20), datetime(2019, 10, 20)
+        )
+        mock_write.assert_called_once_with(
+            "my/path/baz.json", ["commit-foo", "commit-bar", "commit-baz"]
+        )
+
+    @patch("harvest.collator.Collator.write")
+    @patch("harvest.collator.Collator.read")
+    def test_collate_end_date_only_no_date_seperators(self, mock_read, mock_write):
         """Ensures collate sub-command works when only end date provided."""
         mock_read.return_value = ["commit-foo", "commit-bar", "commit-baz"]
         self.harvest.run(
@@ -121,9 +204,9 @@ class TestHarvestCLICollate(unittest.TestCase):
                 "https://github.com/foo/bar",
                 "my/path/baz.json",
                 "--start",
-                "20191020",
+                "2019-10-20",
                 "--end",
-                "20191120",
+                "2019-11-20",
             ]
         )
         mock_read.assert_called_once_with(
@@ -144,9 +227,9 @@ class TestHarvestCLICollate(unittest.TestCase):
                 "https://github.com/foo/bar",
                 "my/path/baz.json",
                 "--start",
-                "20191120",
+                "2019-11-20",
                 "--end",
-                "20191120",
+                "2019-11-20",
             ]
         )
         mock_read.assert_called_once_with(
@@ -166,9 +249,9 @@ class TestHarvestCLICollate(unittest.TestCase):
                 "https://github.com/foo/bar",
                 "my/path/baz.json",
                 "--start",
-                "20191120",
+                "2019-11-20",
                 "--end",
-                "20191020",
+                "2019-10-20",
             ]
         )
         mock_read.assert_not_called()
@@ -184,7 +267,7 @@ class TestHarvestCLICollate(unittest.TestCase):
                 "https://github.com/foo/bar",
                 "my/path/baz.json",
                 "--start",
-                (datetime.today() + timedelta(days=1)).strftime("%Y%m%d"),
+                (datetime.today() + timedelta(days=1)).strftime("%Y-%m-%d"),
             ]
         )
         mock_read.assert_not_called()
@@ -202,7 +285,7 @@ class TestHarvestCLICollate(unittest.TestCase):
                 "--start",
                 "20191120",
                 "--end",
-                (datetime.today() + timedelta(days=1)).strftime("%Y%m%d"),
+                (datetime.today() + timedelta(days=1)).strftime("%Y-%m-%d"),
             ]
         )
         mock_read.assert_not_called()
