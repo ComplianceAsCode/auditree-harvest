@@ -45,6 +45,14 @@ class _CoreHarvestCommand(Command):
             ),
         )
         self.add_argument(
+            "--branch",
+            help=(
+                "which branch you wish to retrieve git repo evidence from - "
+                "default is master"
+            ),
+            default="master",
+        )
+        self.add_argument(
             "--repo-path",
             help=(
                 "the operating system location of a local git repository - "
@@ -73,6 +81,8 @@ class _CoreHarvestCommand(Command):
         parsed = urlparse(args.repo)
         if not (parsed.scheme and parsed.hostname and parsed.path):
             return "ERROR: repo url must be of the form https://hostname/org/repo"
+        if not args.branch:
+            args.branch = "master"
 
 
 class Collate(_CoreHarvestCommand):
@@ -134,7 +144,7 @@ class Collate(_CoreHarvestCommand):
         collator = Collator(
             args.repo,
             Config(args.creds) if args.creds else None,
-            "master",
+            args.branch,
             args.repo_path,
             args.no_validate,
         )
@@ -189,7 +199,7 @@ class Report(_CoreHarvestCommand):
         reporter = self.report(
             args.repo,
             Config(args.creds) if args.creds else None,
-            "master",
+            args.branch,
             args.repo_path,
             self.template_dir,
             args.no_validate,
