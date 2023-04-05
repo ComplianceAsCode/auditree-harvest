@@ -81,8 +81,6 @@ class _CoreHarvestCommand(Command):
         parsed = urlparse(args.repo)
         if not (parsed.scheme and parsed.hostname and parsed.path):
             return "ERROR: repo url must be of the form https://hostname/org/repo"
-        if not args.branch:
-            args.branch = "master"
 
 
 class Collate(_CoreHarvestCommand):
