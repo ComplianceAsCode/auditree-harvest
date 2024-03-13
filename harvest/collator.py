@@ -27,7 +27,15 @@ from harvest.exceptions import FileMissingError
 class Collator(object):
     """Harvest collator to retrieve Git repository content."""
 
-    def __init__(self, repo_url, creds, branch, repo_path=None, validate=True):
+    def __init__(
+        self,
+        repo_url,
+        creds,
+        branch,
+        repo_path=None,
+        validate=True,
+        include_file_path=False,
+    ):
         """Construct the Collator object."""
         parsed = urlparse(repo_url)
         self.scheme = parsed.scheme
@@ -38,6 +46,7 @@ class Collator(object):
         self.repo_path = repo_path
         self.git_repo = None
         self.validate = validate
+        self.include_file_path = include_file_path
 
     @property
     def local_path(self):
@@ -84,16 +93,21 @@ class Collator(object):
             raise FileMissingError(f"{filepath} not found between {since} and {until}")
         return commits
 
-    def write(self, filepath, commits):
+    def write(self, filepath: str, commits):
         """
         Create file artifacts.
 
         :param str filepath: The relative path to the file within the repo
         :param list commits: A list of commits for a given file and date range
         """
+        file_path_include = ""
+        if self.include_file_path:
+            file_path_include = "_".join(filepath.rsplit("/")[:-1]) + "_"
+
         for commit in commits:
             file_name = (
                 f"./{self._ts_to_str(commit.committed_date)}_"
+                f"{file_path_include}"
                 f'{filepath.rsplit("/", 1).pop()}'
             )
             with open(file_name, "w+") as f:

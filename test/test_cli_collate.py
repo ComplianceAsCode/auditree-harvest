@@ -307,3 +307,27 @@ class TestHarvestCLICollate(unittest.TestCase):
             datetime(today.year, today.month, today.day),
         )
         mock_write.assert_called_once_with("my/path/baz.json", ["commit-foo"])
+
+    @patch("harvest.collator.Collator.write")
+    @patch("harvest.collator.Collator.read")
+    def test_collate_include_file_path(self, mock_read, mock_write):
+        """Ensures collate sub-command works when '--include-file-path' is provided."""
+        mock_read.return_value = ["commit-foo"]
+        self.harvest.run(
+            [
+                "collate",
+                "local",
+                "my/path/baz.json",
+                "--include-file-path",
+                "--repo-path",
+                "os/repo/path",
+            ]
+        )
+        today = datetime.today()
+
+        mock_read.assert_called_once_with(
+            "my/path/baz.json",
+            datetime(today.year, today.month, today.day),
+            datetime(today.year, today.month, today.day),
+        )
+        mock_write.assert_called_once_with("my/path/baz.json", ["commit-foo"])
