@@ -153,6 +153,18 @@ class TestCollator(unittest.TestCase):
         self.assertIn(call("./20191105_foo.json", "w+"), m.mock_calls)
         self.assertIn(call("./20191101_foo.json", "w+"), m.mock_calls)
 
+    def test_write_includes_file_path(self):
+        m = mock_open()
+        with patch("builtins.open", m):
+            collator = Collator(*self.args, include_file_path=True)
+            collator.write("raw/foo/foo.json", self.commits)
+        handle = m()
+
+        self.assertEqual(handle.write.call_count, 3)
+        self.assertIn(call("./20191106_raw_foo_foo.json", "w+"), m.mock_calls)
+        self.assertIn(call("./20191105_raw_foo_foo.json", "w+"), m.mock_calls)
+        self.assertIn(call("./20191101_raw_foo_foo.json", "w+"), m.mock_calls)
+
     @patch("harvest.collator.git.Repo.clone_from")
     @patch("harvest.collator.os.path.isdir")
     def test_checkout_clone(self, is_dir_mock, clone_from_mock):

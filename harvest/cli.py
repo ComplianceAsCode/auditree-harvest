@@ -108,6 +108,12 @@ class Collate(_CoreHarvestCommand):
             metavar="YYYY-MM-DD or YYYYMMDD",
             default=False,
         )
+        self.add_argument(
+            "--include-file-path",
+            help="Should the file path be included in the saved file names",
+            action="store_true",
+            dest="include_file_path",
+        )
 
     def _validate_arguments(self, args):
         if not args.end:
@@ -137,6 +143,7 @@ class Collate(_CoreHarvestCommand):
             "master",
             args.repo_path,
             args.no_validate,
+            include_file_path=args.include_file_path,
         )
 
         for file in args.filepath:
